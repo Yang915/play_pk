@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+
+        #left {
+            margin-left: 20%;
+            background-color: rgba(226, 5, 9, 0.31);
+            width: 300px;
+            height: 500px;
+            float: left;
+        }
+
+        #center {
+            float: left;
+            width: 160px;
+            margin-left: 25px;
+            margin-top: 100px;
+            height: 300px;
+            background-color: yellow;
+            text-align: center;
+        }
+
+        #right {
+            margin-right: 20%;
+            background-color: rgba(155, 235, 10, 0.73);
+            width: 300px;
+            height: 500px;
+            float: right;
+        }
+    </style>
+    <title>dispaly</title>
+</head>
+<body>
+<div>
+<!--角色1-->
+    <div id="left">
+        <div>
+            <h2><span id="p1">{{ player1.UserName }}</span>角色信息：</h2>
+            {% for key,val in player1.items() %}
+                {% if key not in [ '_id','UserName' ] %}
+
+                    {% if key in ['Equip','Package'] %}
+
+                        {% if val %}
+                            <p>{{ key }}:</p>
+                            {% for equip in val %}
+                                <p style="margin-left: 20px">
+                                    {% for k,v in equip.items() %}
+                                        {{ k }}:{{ v }}
+                                    {% endfor %}
+                                    ;</p>
+                            {% endfor %}
+
+                        {% else %}
+                            <p>{{ key }}:空！</p>
+                        {% endif %}
+                    {% else %}
+                        <p>{{ key }}:{{ val }}</p>
+                    {% endif %}
+
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div>
+            <h3>道具操作：</h3>
+            <form action="/player/{{ player1.UserName }}" method="post" style="margin-left: 30px">
+                <!--当前装备-->
+                <div>
+                    <span>当前装备：</span>
+                    <select name="down_equip" id="down_equip">
+                        <option style="width: 50px" value="">----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+                        {% for equip in player1.Equip %}
+                            <option value="{{ equip.name }}">{{ equip.name }}</option>
+                        {% endfor %}
+
+                    </select>
+                    <input type="submit" value="<<卸掉">
+                </div>
+                <!--当前背包-->
+                <div>
+                    <span>当前背包：</span>
+                    <select name="up_equip" id="up_equip">
+                        <option style="width: 50px" value="">----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+                        {% for equip in player1.Package %}
+                            <option style="width: 20px" value="{{ equip.name }}">{{ equip.name }}</option>
+                        {% endfor %}
+
+                    </select>
+                    <input type="submit" value="使用>>">
+                </div>
+
+
+            </form>
+        </div>
+
+
+    </div>
+<!--随机pk操作-->
+    <div id="center">
+        <h1>PK</h1>
+        <button id="pk">开战</button>
+        <hr>
+        <h5>{{ log.time }}</h5>
+        <div id="log">{{ log.content }}</div>
+    </div>
+
+
+    <div id="right">
+        <div>
+            <h2><span id="p2">{{ player2.UserName }}</span>角色信息：</h2>
+            {% for key,val in player2.items() %}
+                {% if key not in [ '_id','UserName'] %}
+                    {% if key in ['Equip','Package'] %}
+
+                        {% if val %}
+                            <p>{{ key }}:</p>
+                            {% for equip in val %}
+                                <p style="margin-left: 20px">
+                                    {% for k,v in equip.items() %}
+                                        {{ k }}:{{ v }}
+                                    {% endfor %}
+                                    ;</p>
+                            {% endfor %}
+
+                        {% else %}
+                            <p>{{ key }}:空！</p>
+                        {% endif %}
+                    {% else %}
+                        <p>{{ key }}:{{ val }}</p>
+                    {% endif %}
+
+                {% endif %}
+            {% endfor %}
+
+        </div>
+
+        <div>
+            <h3>道具操作：</h3>
+            <form action="/player/{{ player2.UserName }}" method="post" style="margin-left: 30px">
+                <!--当前装备-->
+                <div>
+                    <span>当前装备：</span>
+                    <select name="down_equip" id="down_equip">
+                        <option style="width: 50px" value="">----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+                        {% for equip in player2.Equip %}
+                            <option value="{{ equip.name }}">{{ equip.name }}</option>
+                        {% endfor %}
+
+                    </select>
+                    <input type="submit" value="<<卸掉">
+                </div>
+                <!--当前背包-->
+                <div>
+                    <span>当前背包：</span>
+                    <select name="up_equip" id="up_equip">
+                        <option style="width: 50px" value="">----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+                        {% for equip in player2.Package %}
+                            <option style="width: 20px" value="{{ equip.name }}">{{ equip.name }}</option>
+                        {% endfor %}
+
+                    </select>
+                    <input type="submit" value="使用>>">
+                </div>
+
+
+            </form>
+        </div>
+    </div>
+
+</div>
+
+</body>
+<script src="/static/jquery-3.4.1.js"></script>
+<script>
+    $('#pk').click(function () {
+        var serv = 'http://127.0.0.1:5000';
+        var player1 = $('#p1').text();
+        var player2 = $('#p2').text();
+        var data = {'player1': player1, 'player2': player2};
+        console.log(data);
+        $.ajax({
+                url: serv + '/displayer/pk',
+                type: 'post',
+                data: data,
+                success: function (response) {
+                    console.log(response);
+
+                    location.href = serv + response.url + '/' + response.time;
+
+                },
+            }
+        );
+    })
+
+</script>
+</html>
